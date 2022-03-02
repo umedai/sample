@@ -38,6 +38,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     daily_earn = models.DecimalField("本日の収益(SLP)", max_digits=10, decimal_places=3, default="0")
     monthly_earn = models.DecimalField("今月の収益(SLP)", max_digits=10, decimal_places=3, default="0")
     all_earn = models.DecimalField("総収益(SLP)", max_digits=10, decimal_places=3, default="0")
+    axie_payout = models.DecimalField("出金額(SLP)", max_digits=10, decimal_places=3, default="0")
     tracker = FieldTracker()
 
     is_staff = models.BooleanField(
@@ -84,3 +85,24 @@ class SlpMonthlyLog(models.Model):
     monthly_log_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     monthly_log_day = models.DateField("日付", auto_now=True, auto_now_add=False)
     monthly_log_data = models.DecimalField("金額", max_digits=10, decimal_places=3, default="0")
+
+
+# 入出金管理ログモデル
+class SlpPayLog(models.Model):
+    pay_log_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    pay_log_day = models.DateField("日付", auto_now=True, auto_now_add=False)
+    pay_log_data = models.DecimalField("金額", max_digits=10, decimal_places=3, default="0")
+    axie_all_payout = models.DecimalField("総出金額(SLP)", max_digits=10, decimal_places=3, default="0")
+
+    # 申請中判定
+    SENDING = "sending"
+    OUT = "out"
+    STATUS = [
+        (SENDING, "申請中"),
+        (OUT, "出金済")
+    ]
+    pay_status = models.CharField(
+        "出金管理ステータス",
+        max_length=8,
+        choices=STATUS,
+    )
